@@ -3,13 +3,18 @@
 
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <style>
 
 html,
 body {
   margin: 0;
+  padding: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -20,60 +25,180 @@ model-viewer {
   width: 100%;
   height: 100%;
   background: #222a2d;
+
   --progress-bar-color: #bacf4f;
+  --progress-bar-height: 3px;
 }
 
 .texto {
   position: absolute;
   left: 50%;
   bottom: 25px;
+
   transform: translateX(-50%);
+
   color: rgba(255,255,255,0.6);
+
   font-family: Arial, sans-serif;
   font-size: 11px;
   letter-spacing: 2px;
+
   pointer-events: none;
+}
+
+#error {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  color: #bacf4f;
+
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+
+  display: none;
+
+  text-align: center;
 }
 
 </style>
 
+
+<!-- SOPORTE PARA MESHOPT -->
+
+<script>
+
+self.ModelViewerElement =
+  self.ModelViewerElement || {};
+
+self.ModelViewerElement.meshoptDecoderLocation =
+  "https://cdn.jsdelivr.net/npm/meshoptimizer/meshopt_decoder.js";
+
+</script>
+
+
+<!-- MODEL VIEWER -->
+
+<script
+  type="module"
+  src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js">
+</script>
+
 </head>
+
 
 <body>
 
 <model-viewer
   id="visor"
+
   camera-controls
+
   auto-rotate
   auto-rotate-delay="2500"
   rotation-per-second="4deg"
+
   shadow-intensity="1"
   shadow-softness="1"
+
   exposure="1"
+
   environment-image="neutral"
-  interaction-prompt="none">
+
+  interaction-prompt="none"
+
+  loading="eager">
 </model-viewer>
 
+
 <div class="texto">
-ARRASTRÁ PARA EXPLORAR
+  ARRASTRÁ PARA EXPLORAR
 </div>
 
-<script
-type="module"
-src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
-</script>
+
+<div id="error">
+  No se pudo cargar el modelo 3D
+</div>
+
 
 <script>
 
-const parametros = new URLSearchParams(window.location.search);
+const parametros =
+  new URLSearchParams(
+    window.location.search
+  );
 
-let modelo = parametros.get("modelo");
+
+let modelo =
+  parametros.get("modelo");
+
 
 if (!modelo) {
-  modelo = "Modelos-3d.glb";
+
+  modelo =
+    "Modelos-3d.glb";
+
 }
 
-document.getElementById("visor").src = modelo;
+
+const visor =
+  document.getElementById(
+    "visor"
+  );
+
+
+const error =
+  document.getElementById(
+    "error"
+  );
+
+
+visor.src =
+  modelo;
+
+
+/* MODELO CARGADO */
+
+visor.addEventListener(
+  "load",
+  () => {
+
+    console.log(
+      "Modelo cargado:",
+      modelo
+    );
+
+    error.style.display =
+      "none";
+
+  }
+);
+
+
+/* ERROR DE CARGA */
+
+visor.addEventListener(
+  "error",
+  (event) => {
+
+    console.error(
+      "Error cargando:",
+      modelo,
+      event
+    );
+
+    error.innerHTML =
+      "No se pudo cargar:<br>" +
+      modelo;
+
+    error.style.display =
+      "block";
+
+  }
+);
 
 </script>
 
